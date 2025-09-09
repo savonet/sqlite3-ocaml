@@ -873,8 +873,10 @@ static inline value prepare_it(db_wrap *dbw, const char *sql, int sql_len,
   }
   atomic_fetch_add(&dbw->ref_count, 1);
 #if SQLITE_STMTSTATUS_MEMUSED
+  caml_release_runtime_system();
   size_t mem = sizeof(stmt_wrap) + sql_len + 1 +
                sqlite3_stmt_status(stmtw->stmt, SQLITE_STMTSTATUS_MEMUSED, 0);
+  caml_acquire_runtime_system();
   value v_stmt =
       caml_alloc_custom_mem(&stmt_wrap_ops, sizeof(stmt_wrap *), mem);
 #else
